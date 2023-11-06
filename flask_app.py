@@ -4,7 +4,7 @@
 from flask import Flask, redirect, render_template, request, url_for
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import check_password_hash, generate_password_hash
-from flask_login import login_required, logout_user, login_user, LoginManager, UserMixin
+from flask_login import current_user, login_required, logout_user, login_user, LoginManager, UserMixin
 
 app = Flask(__name__)
 
@@ -61,6 +61,9 @@ class Comment(db.Model):
 def index():
     if request.method == "GET":
         return render_template("main_page.html", comments=Comment.query.all())
+
+    if not current_user.is_authenticated:
+        return redirect(url_for('index'))
 
     comment = Comment(content=request.form["contents"])
     db.session.add(comment)
