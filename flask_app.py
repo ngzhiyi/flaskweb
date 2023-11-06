@@ -3,6 +3,8 @@
 
 from flask import Flask, redirect, render_template, request, url_for
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import check_password_hash, generate_password_hash
+from flask_login import login_user, LoginManager, UserMixin
 
 app = Flask(__name__)
 
@@ -19,6 +21,34 @@ app.config["SQLALCHEMY_POOL_RECYCLE"] = 299
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
+
+app.secret_key = "the quick brown fox jumps over the lazy dog"
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+class User(UserMixin):
+
+    def __init__(self, username, password_hash):
+        self.username = username
+        self.password_hash = password_hash
+
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+
+    def get_id(self):
+        return self.username
+
+all_users = {
+    "admin": User("admin", generate_password_hash("secret")),
+    "bobby drake": User("bobby drake", generate_password_hash("less-secret")),
+    "carol denvers": User("carol denvers", generate_password_hash("completely-secret")),
+}
+
+@login_manager.user_loader
+def load_user(user_id):
+    return all_users.get(user_id)
 
 class Comment(db.Model):
 
@@ -42,7 +72,13 @@ def login():
     if request.method == "GET":
         return render_template("login_page.html", error=False)
 
-    if request.form["username"] != "admin" or request.form["password"] != "secret":
+    username = request.form["username"]
+    if username not in all_users:
+        return render_template("login_page.html", error=True)
+    user = all_users[username]
+
+    if not user.check_password(request.form["password"]):
         return render_template("login_page.html", error=True)
 
+    login_user(user)
     return redirect(url_for('index'))
