@@ -10,7 +10,7 @@ app.config["DEBUG"] = True
 
 SQLALCHEMY_DATABASE_URI = "mysql+mysqlconnector://{username}:{password}@{hostname}/{databasename}".format(
     username="ngzhiyi",
-    password="sctp01!@$",
+    password="sctp0123",
     hostname="ngzhiyi.mysql.pythonanywhere-services.com",
     databasename="ngzhiyi$comments",
 )
@@ -19,6 +19,13 @@ app.config["SQLALCHEMY_POOL_RECYCLE"] = 299
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
+
+class Comment(db.Model):
+
+    __tablename__ = "comments"
+
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.String(4096))
 
 comments = []
 
