@@ -3,12 +3,12 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        
+
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
-        
+
         <title>Zhi Yi's scratchboard page</title>
     </head>
-    
+
     <body>
         <nav class="navbar navbar-inverse">
             <div class="container">
@@ -30,20 +30,28 @@
                 </ul>
             </div>
         </nav>
-        
+
         <div class="container">
-            
+
             {% for comment in comments %}
                 <div class="row" style="margin-bottom: 1ex">
                     <div>
                         {{ comment.content }}
                     </div>
                     <div>
-                        <small>Posted {{ timestamp.strftime("%A, %d %B %Y at %H:%M") }} by anonymous</small>
+                        <small>
+                            Posted
+                            {% if comment.posted %}
+                                {{ comment.posted.strftime("%A, %d %B %Y at %H:%M") }}
+                            {% else %}
+                                at an unknown time
+                            {% endif %}
+                            by anonymous
+                        </small>
                     </div>
                 </div>
             {% endfor %}
-            
+
             {% if current_user.is_authenticated %}
                 <div class="row">
                     <form action="." method="POST">
@@ -52,10 +60,10 @@
                     </form>
                 </div>
             {% endif %}
-            
+
         </div>
         <!-- /.container -->
-        
+
         <footer id="footer" class="footer bg-black small text-center text-white-50">
             <div class="container px-4 px-lg-5">
                 <p>This is a Simple Web App using python, Flask & MySQL Database </p>
