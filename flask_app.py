@@ -1,7 +1,8 @@
 
 # A very simple Flask Hello World app for you to get started with...
 
-from datetime import datetime
+from sqlalchemy import func
+from datetime import datetime, timezone, timedelta
 from flask import Flask, redirect, render_template, request, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -47,20 +48,23 @@ class User(UserMixin, db.Model):
 def load_user(user_id):
     return User.query.filter_by(username=user_id).first()
 
+# create a timezone object for GMT+8
+gmt8_timezone = timezone(timedelta(hours=8))
+
 class Comment(db.Model):
 
     __tablename__ = "comments"
 
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.String(4096))
-    posted = db.Column(db.DateTime, default=datetime.now)
+    posted = db.Column(db.DateTime, server_default=func.now(), default=datetime.now)
     commenter_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     commenter = db.relationship('User', foreign_keys=commenter_id)
 
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "GET":
-        return render_template("main_page.html", comments=Comment.query.all())
+        return render_template("main_page.html", comments=Comment.query.all(), gmt8_timezone=gmt8_timezone, timezone=timezone)
 
     if not current_user.is_authenticated:
         return redirect(url_for('index'))

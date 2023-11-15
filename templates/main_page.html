@@ -182,7 +182,7 @@
                     <small>
                         Posted
                         {% if comment.posted %}
-                            {{ comment.posted.strftime("%A, %d %B %Y at %H:%M") }}
+                            {{ comment.posted.replace(tzinfo=timezone.utc).astimezone(gmt8_timezone).strftime("%A, %d %B %Y at %H:%M %Z") }}
                         {% else %}
                             at an unknown time
                         {% endif %}
