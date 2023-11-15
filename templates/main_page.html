@@ -1,82 +1,245 @@
-<html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+<!DOCTYPE html>
+<html class="no-js" lang="en">
 
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Zhi Yi's Portfolio</title>
+	<link rel="shortcut icon" href="static/favicon.ico" type="image/x-icon">
+	<link rel="icon" href="static/favicon.ico" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,900" rel="stylesheet">
+    <link rel="stylesheet" href="static/libs/font-awesome/css/font-awesome.min.css">
+    <link href="static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="static/css/styles.css" rel="stylesheet">
+    <style>
+        .comments {text-align:center;}
+    </style>
+</head>
 
-        <title>Zhi Yi's scratchboard page</title>
-    </head>
-
-    <body>
-        <nav class="navbar navbar-inverse">
-            <div class="container">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href="#">Zhi Yi's scratchpad</a>
-                </div>
-                <ul class="nav navbar-nav navbar-right">
-                    {% if current_user.is_authenticated %}
-                        <li><a href="{{ url_for('logout') }}">Log out</a></li>
-                    {% else %}
-                        <li><a href="{{ url_for('login') }}">Log in</a></li>
-                    {% endif %}
-                </ul>
-            </div>
-        </nav>
-
-        <div class="container">
-
-            {% for comment in comments %}
-                <div class="row" style="margin-bottom: 1ex">
-                    <div>
-                        {{ comment.content }}
-                    </div>
-                    <div>
-                        <small>
-                            Posted
-                            {% if comment.posted %}
-                                {{ comment.posted.strftime("%A, %d %B %Y at %H:%M") }}
-                            {% else %}
-                                at an unknown time
-                            {% endif %}
-                            by
-                            {% if comment.commenter %}
-                                {{ comment.commenter.username }}
-                            {% else %}
-                                anonymous
-                            {% endif %}
-                        </small>
-                    </div>
-                </div>
-            {% endfor %}
-
-            {% if current_user.is_authenticated %}
-                <div class="row">
-                    <form action="." method="POST">
-                        <textarea name="contents" placeholder="Enter a comment"></textarea class="form-control">
-                        <input type="submit" class="btn btn-success" value="Post comment">
-                    </form>
-                </div>
-            {% endif %}
-
+<body>
+    <div id="mobile-menu-open" class="shadow-large">
+        <i class="fa fa-bars" aria-hidden="true"></i>
+    </div>
+    <!-- End #mobile-menu-toggle -->
+    <header>
+        <div id="mobile-menu-close">
+            <span>Close</span> <i class="fa fa-times" aria-hidden="true"></i>
         </div>
-        <!-- /.container -->
+        <ul id="menu" class="shadow">
+            <li>
+                <a href="#about">About</a>
+            </li>
+            <li>
+                <a href="#experience">Experience</a>
+            </li>
+            <li>
+                <a href="#education">Education</a>
+            </li>
+            <li>
+                <a href="#skills">Skills</a>
+            </li>
+            <li>
+                <a href="#comments">Comments</a>
+            </li>
+            <button class="auth-btn" data-url-login="{{ url_for('login') }}" data-url-logout="{{ url_for('logout') }}">
+                {% if current_user.is_authenticated %}
+                    Log out
+                {% else %}
+                    Log in
+                {% endif %}
+            </button>
+        </ul>
+    </header>
+    <!-- End header -->
 
-        <footer id="footer" class="footer bg-black small text-center text-white-50">
-            <div class="container px-4 px-lg-5">
-                <p>This is a Simple Web App using python, Flask & MySQL Database </p>
-                This project was brought to you by Ng Zhi Yi
-                <a href="https://sg.linkedin.com/in/zhi-yi-ng-08aa31139" target="_blank">
-                    <img src="https://cdn1.iconfinder.com/data/icons/flat-social-icons-by-lokas-software/48/linkedin.png" height="25" width="“25&quot;" alt="Ng Zhi Yi's Linkedin Profile">
-                </a>
+    <div id="lead">
+        <div id="lead-content">
+            <h1>Ng Zhi Yi</h1>
+            <h2>Aspiring Cloud Engineer</h2>
+        </div>
+        <!-- End #lead-content -->
+
+        <div id="lead-overlay"></div>
+
+        <div id="lead-down">
+            <span>
+                <i class="fa fa-chevron-down" aria-hidden="true"></i>
+            </span>
+        </div>
+        <!-- End #lead-down -->
+    </div>
+    <!-- End #lead -->
+
+    <div id="about">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h2 class="heading">About Me</h2>
+                    <img src="static/images/Mugshot.png" alt="Your Name" class="profile-image" style="max-width: 40%; display: block; margin-top: 10px; border-radius: 10px;">
+                </div>
+                <div class="col-md-8">
+                    <p>
+                        Hello, my name is Zhi Yi, and thank you for visiting my portfolio website.
+                        <br>
+                        <br>
+                        After more than 5 years of experience in the Accounting and Tax field, I decided to leave the industry and pursue my passion in Tech. I am currently a trainee in Generation Singapore's Cloud Support & DevOps Career Transition Programme,
+                        where I am being equipped with the necessary skills like Linux, Python and Microsoft Azure fundamentals in order to successfully embark on my journey into this new and exciting frontier.
+                        <br>
+                        <br>
+                        I look forward to joining an organisation which will allow me to grow as an individual, and effectively employ what I have learnt to on-going / new projects.
+                    </p>
+                </div>
             </div>
-        </footer>
-    </body>
+        </div>
+    </div>
+    <!-- End #about -->
+
+    <div id="experience" class="background-alt">
+        <h2 class="heading">Experience</h2>
+        <div id="experience-timeline">
+            <div data-date="October 2023 – January 2024 (est.)">
+                <h3>Generation Singapore</h3>
+                <h4>Trainee</h4>
+                <ul>
+                    <li>Engaging in an intensive training programme designed to prepare participants for a position in the Cloud and DevOps industry by learning
+                        about coding, programming, persistence, professionalism, and the essential behavioral skills and mindsets to be successful on the job.</li>
+                <ul>
+            </div>
+            <div data-date="August 2022 – May 2023">
+                <h3>Outstanding Capital Pte. Ltd.</h3>
+                <h4>Finance Manager</h4>
+                <ul>
+                    <li>Keeping proper records and tracking of all investments and consolidating all investment portfolios from banks</li>
+                    <li>Analysis / evaluation and compiling of monthly report of all investee companies' financials</li>
+                    <li>Preparing annual budget and monitoring of income and expenditure according to approved budget</li>
+                    <li>Liaising with auditors for statutory and special audits as well as ensuring proper record keeping for audit purposes</li>
+                    <li>Understanding and familiarisation of Family Office tax exemption scheme (13O) approved by the Monetary Authority of Singapore (MAS)</li>
+                    <li>Setting up of companies' Microsoft Office 365 and Onedrive accounts as well as acting as the administrator</li>
+                <ul>
+            </div>
+            <div data-date="October 2017 – July 2022">
+                <h3>BDO LLP Singapore (Tax Advisory)</h3>
+                <h4>Assistant Manager</h4>
+                <ul>
+                    <li>Providing tax compliance services to clients</li>
+                    <li>Managing a portfolio of more than 70 clients spanning various industries (Construction, Food & Beverage, Section 13A Shipping, Investment Holding, etc.)</li>
+                    <li>Preparing and reviewing client’s corporate income tax returns, along with supporting schedules and Form for Reporting of Related Party Transactions (RPT)</li>
+                    <li>Providing of ad-hoc services including preparing and filing client's Section 24 Notice of Election, withholding tax returns (S45 Form), application for Certificate of Residence (COR), waiver of shareholding test etc.</li>
+                    <li>Attending to the Inland Revenue Authority of Singapore (IRAS) queries to resolve tax issues with the IRAS officers</li>
+                    <li>Collaboration with other departments to implement firm wide migration of HR / admin system</li>
+                <ul>
+            </div>
+        </div>
+    </div>
+    <!-- End #experience -->
+
+    <div id="education">
+        <h2 class="heading">Education</h2>
+        <div class="education-block">
+            <h3>University of London (SIM Global Education)</h3>
+            <span class="education-date">2014 - 2017</span>
+            <h4>Bachelor of Accounting and Finance (2nd Class Honours, Upper Division)</h4>
+        </div>
+        <!-- End .education-block -->
+        <div class="education-block">
+            <h3>Jurong Junior College</h3>
+            <span class="education-date">2009 - 2011</span>
+            <h4>GCE A-Levels</h4>
+        </div>
+        <!-- End .education-block -->
+        <div class="education-block">
+            <h3>Bukit Panjang Government High School</h3>
+            <span class="education-date">2005 - 2008</span>
+            <h4>GCE O-Levels</h4>
+        </div>
+        <!-- End .education-block -->
+    </div>
+    <!-- End #education -->
+
+    <div id="skills" class="background-alt">
+        <h2 class="heading">Skills</h2>
+        <ul>
+            <li>python</li>
+            <li>Linux</li>
+            <li>Microsoft Azure</li>
+            <li>html</li>
+            <li>Ansible</li>
+            <li>Docker</li>
+            <li>Terraform</li>
+        </ul>
+    </div>
+    <!-- End #skills -->
+
+    <div id="comments" class="comments">
+        <h2 class="heading">Comments</h2>
+        {% for comment in comments %}
+            <div class="row" style="margin-bottom: 1ex">
+                <div>
+                    {{ comment.content }}
+                </div>
+                <div>
+                    <small>
+                        Posted
+                        {% if comment.posted %}
+                            {{ comment.posted.strftime("%A, %d %B %Y at %H:%M") }}
+                        {% else %}
+                            at an unknown time
+                        {% endif %}
+                        by
+                        {% if comment.commenter %}
+                            {{ comment.commenter.username }}
+                        {% else %}
+                            anonymous
+                        {% endif %}
+                    </small>
+                </div>
+            </div>
+        {% endfor %}
+        {% if current_user.is_authenticated %}
+            <div class="row">
+                <form action="." method="POST">
+                    <textarea name="contents" placeholder="Enter a comment"></textarea class="form-control">
+                    <input type="submit" class="btn btn-success" value="Post comment">
+                </form>
+            </div>
+        {% endif %}
+    </div>
+    <!-- End #comments -->
+
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-5 copyright">
+                    <p>
+                        Copyright &copy; <span id="current-year">2023</span> This simple web app using python, Flask & MySQL Database is brought to you by Ng Zhi Yi
+                    </p>
+                </div>
+                <div class="col-sm-2 top">
+                    <span id="to-top">
+                        <i class="fa fa-chevron-up" aria-hidden="true"></i>
+                    </span>
+                </div>
+                <div class="col-sm-5 social">
+                    <ul>
+                        <li>
+                            <a href="https://github.com/" target="_blank"><i class="fa fa-github" aria-hidden="true"></i></a>
+                        </li>
+                        <li>
+                            <a href="https://stackoverflow.com/" target="_blank"><i class="fa fa-stack-overflow" aria-hidden="true"></i></a>
+                        </li>
+                        <li>
+                            <a href="https://sg.linkedin.com/in/zhi-yi-ng-08aa31139" target="_blank"><i class="fa fa-linkedin" aria-hidden="true"></i></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- End footer -->
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="static/js/scripts.min.js"></script>
+</body>
+
 </html>
