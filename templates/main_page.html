@@ -20,6 +20,17 @@
 </head>
 
 <body>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class="flashes">
+      {% for message in messages %}
+        <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
     <div id="mobile-menu-open" class="shadow-large">
         <i class="fa fa-bars" aria-hidden="true"></i>
     </div>
@@ -184,7 +195,7 @@
                     <small>
                         Posted
                         {% if comment.posted %}
-                            {{ comment.posted.replace(tzinfo=timezone.utc).astimezone(gmt8_timezone).strftime("%A, %d %B %Y at %H:%M %Z") }}
+                            {{ comment.posted.replace(tzinfo=timezone.utc).astimezone(gmt8_timezone).strftime("%A, %d %B %Y at %H:%M SGT") }}
                         {% else %}
                             at an unknown time
                         {% endif %}
@@ -195,13 +206,22 @@
                             anonymous
                         {% endif %}
                     </small>
+                    <!-- Add the comment deletion form here -->
+                    {% if current_user.is_authenticated and (current_user.username == 'admin' or current_user.id == comment.commenter_id) %}
+                        <form method="POST" action="{{ url_for('delete_comment', comment_id=comment.id) }}">
+                            {{ comment_deletion_form.comment_id(value=comment.id) }}
+                            {{ comment_deletion_form.csrf_token }}
+                            {{ comment_deletion_form.submit(class="btn btn-danger") }}
+                        </form>
+                    {% endif %}
                 </div>
             </div>
         {% endfor %}
         {% if current_user.is_authenticated %}
             <div class="row">
-                <form action="." method="POST">
-                    <textarea name="contents" placeholder="Enter a comment"></textarea class="form-control">
+                <form action="{{ url_for('index') }}" method="POST">
+                    {{ comment_form.csrf_token }}
+                    <textarea name="contents" placeholder="Enter a comment" class="form-control"></textarea>
                     <input type="submit" class="btn btn-success" value="Post comment">
                 </form>
             </div>

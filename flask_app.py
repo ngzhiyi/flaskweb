@@ -1,15 +1,19 @@
 
 # A very simple Flask Hello World app for you to get started with...
 
+from forms import CommentDeletionForm, LoginForm, CommentForm
 from sqlalchemy import func
 from datetime import datetime, timezone, timedelta
-from flask import Flask, redirect, render_template, request, url_for
+from flask import Flask, redirect, render_template, request, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from werkzeug.security import check_password_hash
 from flask_login import current_user, login_required, logout_user, login_user, LoginManager, UserMixin
+from flask_wtf.csrf import CSRFProtect
 
 app = Flask(__name__)
+
+csrf = CSRFProtect(app)
 
 app.config["DEBUG"] = True
 
@@ -61,33 +65,65 @@ class Comment(db.Model):
     commenter_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     commenter = db.relationship('User', foreign_keys=commenter_id)
 
+    def delete_comment(self):
+        db.session.delete(self)
+        db.session.commit()
+
+@app.route('/delete_comment/<int:comment_id>', methods=['POST'])
+@login_required
+@csrf.exempt
+def delete_comment(comment_id):
+    # Get the comment by its ID
+    comment = Comment.query.get(comment_id)
+
+    ## if comment and current_user.id == comment.commenter_id:
+    if current_user.is_authenticated and (current_user.username == 'admin' or current_user.id == comment.commenter_id):
+        # Use the delete_comment method to delete the comment
+        comment.delete_comment()
+
+    return redirect(url_for('index'))  # Redirect to the main page after deletion
+
 @app.route("/", methods=["GET", "POST"])
 def index():
-    if request.method == "GET":
-        return render_template("main_page.html", comments=Comment.query.all(), gmt8_timezone=gmt8_timezone, timezone=timezone)
+    comment_deletion_form = CommentDeletionForm()
+    comment_form = CommentForm()
 
-    if not current_user.is_authenticated:
-        return redirect(url_for('index'))
+    if request.method == "POST":
+        # Check if the comment form for posting comments is submitted and valid
+        if comment_form.validate_on_submit():
+            if current_user.is_authenticated:
+                comment_content = comment_form.contents.data
+                comment = Comment(content=comment_content, commenter=current_user)
+                db.session.add(comment)
+                db.session.commit()
+                # Redirect after posting the comment if needed
+                return redirect(url_for('index'))
 
-    comment = Comment(content=request.form["contents"], commenter=current_user)
-    db.session.add(comment)
-    db.session.commit()
-    return redirect(url_for('index'))
+        # Check if the comment deletion form is submitted and valid
+        elif comment_deletion_form.validate_on_submit():
+            comment_id_to_delete = comment_deletion_form.comment_id.data
+            delete_comment(comment_id_to_delete)
+            # Redirect after deleting the comment if needed
+            return redirect(url_for('index'))
+
+    comments = Comment.query.all()
+
+    return render_template("main_page.html", comments=comments, gmt8_timezone=gmt8_timezone, timezone=timezone, comment_deletion_form=comment_deletion_form, comment_form=comment_form)
 
 @app.route("/login/", methods=["GET", "POST"])
 def login():
-    if request.method == "GET":
-        return render_template("login_page.html", error=False)
+    form = LoginForm()
 
-    user = load_user(request.form["username"])
-    if user is None:
-        return render_template("login_page.html", error=True)
+    if form.validate_on_submit():
+        user = load_user(form.username.data)
 
-    if not user.check_password(request.form["password"]):
-        return render_template("login_page.html", error=True)
+        if user is not None and user.check_password(form.password.data):
+            login_user(user)
+            return redirect(url_for('index'))
+        else:
+            flash('Invalid username or password', 'error')
 
-    login_user(user)
-    return redirect(url_for('index'))
+    return render_template("login_page.html", form=form)
 
 @app.route("/logout/")
 @login_required

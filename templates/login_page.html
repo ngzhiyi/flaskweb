@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
         <title>Zhi Yi's Portfolio: Log In</title>
+        <style> .custom-alert {border: 1px solid #d9534f; color: #d9534f; background-color: #f2dede; padding: 10px; margin-bottom: 15px; border-radius: 4px;}</style>
     </head>
 
     <body>
@@ -26,22 +27,30 @@
 
             <div class="row">
 
-                {% if error %}
-                    <div class="alert alert-warning" role="alert">
-                        Incorrect username or password
-                    </div>
-                {% endif %}
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} custom-alert">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
 
-                <form action="." method="POST">
-                  <div class="form-group">
-                    <label for="username">Username:</label>
-                    <input class="form-control" id="username" name="username" placeholder="Enter your username">
-                  </div>
-                  <div class="form-group">
-                    <label for="password">Password:</label>
-                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password">
-                  </div>
-                  <button type="submit" class="btn btn-success">Log in</button>
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+
+                    <div class="form-group">
+                        {{ form.username.label }}
+                        {{ form.username(class="form-control", placeholder="Enter your username") }}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.password.label }}
+                        {{ form.password(class="form-control", placeholder="Enter your password") }}
+                    </div>
+
+                    <div>{{ form.submit(class="btn btn-success") }}</div>
                 </form>
             </div>
 
