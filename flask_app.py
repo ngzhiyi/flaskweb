@@ -10,6 +10,7 @@ from flask_migrate import Migrate
 from werkzeug.security import check_password_hash
 from flask_login import current_user, login_required, logout_user, login_user, LoginManager, UserMixin
 from flask_wtf.csrf import CSRFProtect
+import os
 
 app = Flask(__name__)
 
@@ -18,10 +19,10 @@ csrf = CSRFProtect(app)
 app.config["DEBUG"] = True
 
 SQLALCHEMY_DATABASE_URI = "mysql+mysqlconnector://{username}:{password}@{hostname}/{databasename}".format(
-    username="ngzhiyi",
-    password="sctp0123",
-    hostname="ngzhiyi.mysql.pythonanywhere-services.com",
-    databasename="ngzhiyi$comments",
+    username=os.getenv("DB_USERNAME"),
+    password=os.getenv("DB_PASSWORD"),
+    hostname=os.getenv("DB_HOSTNAME"),
+    databasename=os.getenv("DB_NAME"),
 )
 app.config["SQLALCHEMY_DATABASE_URI"] = SQLALCHEMY_DATABASE_URI
 app.config["SQLALCHEMY_POOL_RECYCLE"] = 299
@@ -30,7 +31,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-app.secret_key = "the quick brown fox jumps over the lazy dog"
+app.secret_key = os.getenv("SECRET_KEY")
 login_manager = LoginManager()
 login_manager.init_app(app)
 
